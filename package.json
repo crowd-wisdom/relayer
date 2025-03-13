@@ -2,37 +2,59 @@
   "name": "relayer-crowd-wisdom",
   "version": "0.0.1",
   "description": "",
+  "main": "build/main.js",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "type": "module",
+  "exports": {
+    ".": "./build/main.js"
+  },
+  "files": [
+    "build"
+  ],
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node build/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --forceExit",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@helia/json": "^4.0.2",
     "@nestjs/common": "^11.0.10",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.10",
+    "@nestjs/mongoose": "^11.0.1",
     "@nestjs/platform-express": "^11.0.10",
+    "@nestjs/schedule": "^5.0.1",
     "@nestjs/swagger": "^11.0.4",
+    "@nestjs/throttler": "^6.4.0",
     "@semaphore-protocol/group": "^4.9.0",
     "@semaphore-protocol/identity": "^4.9.0",
     "@semaphore-protocol/proof": "^4.9.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "ethers": "^6.13.5",
+    "helia": "^5.2.1",
+    "lodash": "^4.17.21",
+    "maci-contracts": "file:maci/packages/contracts",
+    "maci-domainobjs": "^2.5.0",
+    "maci-sdk": "file:maci/packages/sdk",
+    "mongoose": "^8.12.1",
+    "multiformats": "^13.3.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@nestjs/cli": "^11.0.4",
     "@nestjs/schematics": "^11.0.1",
     "@nestjs/testing": "^11.0.10",
@@ -64,12 +86,24 @@
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "preset": "ts-jest/presets/default-esm",
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.[jt]s$": "$1"
+    },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ]
   }
 }

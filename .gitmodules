@@ -1,0 +1,3 @@
+[submodule "maci"]
+	path = maci
+	url = https://github.com/crowd-wisdom/maci.git

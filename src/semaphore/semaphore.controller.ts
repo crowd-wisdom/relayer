@@ -12,8 +12,8 @@ import {
     Query,
   } from '@nestjs/common';
   import { ApiTags } from '@nestjs/swagger';
-  import { SemaphoreService } from './semaphore.service';
-import { SemaphoreProof } from '@semaphore-protocol/proof';
+  import { SemaphoreService } from './semaphore.service.js';
+
 
 @ApiTags('semaphore') 
 @Controller('semaphore')
@@ -27,7 +27,7 @@ export class SemaphoreController {
     }
 
     @Get('/createGroup')
-    async createGroup(): Promise<SemaphoreProof> {
+    async createGroup(): Promise<any> {
        const result = await this.semaphoreService.createGroup()
       return result;
     }

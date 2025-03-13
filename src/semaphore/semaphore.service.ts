@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Identity } from "@semaphore-protocol/identity"
 import { Group } from "@semaphore-protocol/group"
-import { generateProof, SemaphoreProof } from "@semaphore-protocol/proof"
+import { generateProof } from "@semaphore-protocol/proof"
+
 
 @Injectable()
 export class SemaphoreService {
@@ -12,7 +13,7 @@ export class SemaphoreService {
         const { privateKey, publicKey, commitment } = new Identity(keyIdentity)
         return commitment
     }
-    async createGroup() :  Promise<SemaphoreProof> {
+    async createGroup() :  Promise<any> {
         const group = new Group()
         const keyIdentity = this.configService.get<string>('KEY_IDENTITY');     
         const identity = new Identity(keyIdentity)

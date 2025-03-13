@@ -1,9 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
+
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const { AppModule } = await import("./app.module.js");
+  const app = await NestFactory.create(AppModule, {
+    logger: ["log", "fatal", "error", "warn"],
+  });
   const config = new DocumentBuilder()
     .setTitle('CrowdWisdom Relayer')
     .setDescription('CrowdWisdom Relayer Description')
