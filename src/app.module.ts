@@ -24,11 +24,11 @@ import { MongooseModule } from '@nestjs/mongoose';
     imports: [ConfigModule],
     inject: [ConfigService],
     useFactory: async (config: ConfigService) => {
-      // if (process.env.NODE_ENV === "test") {
-      //   // const { getTestMongooseModuleOptions } = await import("./jest/mongo.js");
+      if (process.env.NODE_ENV === "test") {
+        const { getTestMongooseModuleOptions } = await import("./jest/mongo.js");
 
-      //   // return getTestMongooseModuleOptions();
-      // }
+        return getTestMongooseModuleOptions();
+      }
       return {
         uri: config.get('MONGO_DB_URI'),
         auth: {
