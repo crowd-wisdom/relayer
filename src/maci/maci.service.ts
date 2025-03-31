@@ -6,7 +6,6 @@ import { PubKey } from "maci-domainobjs";
 import flatten from "lodash/flatten.js";
 import uniqBy from "lodash/uniqBy.js";
 import { MACI, MACI__factory as MACIFactory, Poll, Poll__factory as PollFactory} from "maci-contracts";
-import { ethers } from "ethers";
 import type { PublishMessagesDto } from "./dto/message.dto.js";
 import { MessageRepository } from "./repository/message.repository.js";
 import { Message } from "./schemas/message.schema.js";
@@ -15,6 +14,10 @@ import { MessageBatch } from "./schemas/messageBatch.schema.js";
 import { MessageBatchRepository } from "./repository/messageBatch.repository.js";
 import type { RootFilterQuery } from "mongoose";
 import { IpfsService } from "../ipfs/ipfs.service.js";
+import hardhat from "hardhat";
+import { Signer,Provider, Wallet,JsonRpcProvider,Contract } from "ethers";
+
+
 
 @Injectable()
 export class MaciService {
@@ -63,13 +66,18 @@ export class MaciService {
    * @returns success or not
    */
   async saveMessages(args: PublishMessagesDto): Promise<Message[]> {
-    const provider = new ethers.JsonRpcProvider(this.configService.get<string>('PROVIDER_URL'))
-    const coordinatorWallet =  new ethers.Wallet(this.configService.get<string>('SIGNER_PK') as string,provider)
-    const maciContract = new ethers.Contract(args.maciContractAddress, MACIFactory.abi, coordinatorWallet) as unknown as MACI;
-    // const maciContract = MACIFactory.connect(args.maciContractAddress);
+    let provider : Provider
+    let coordinatorWallet : Wallet | Signer
+    if (process.env.NODE_ENV === "test") {
+      const [signer] = await hardhat.ethers.getSigners();
+      provider = signer.provider
+    }else{
+       provider = new JsonRpcProvider(this.configService.get<string>('PROVIDER_URL'))
+    }
+
+    const maciContract = new Contract(args.maciContractAddress, MACIFactory.abi, provider) as unknown as MACI;
     const pollAddresses = await maciContract.polls(args.poll);
-    // const pollContract = PollFactory.connect(pollAddresses.poll);
-    const pollContract = new ethers.Contract(pollAddresses.poll, PollFactory.abi, coordinatorWallet) as unknown as Poll;
+    const pollContract = new Contract(pollAddresses.poll, PollFactory.abi, provider) as unknown as Poll;
 
     const hashes = await Promise.all(
       args.messages.map(({ data, publicKey }) =>
@@ -91,7 +99,7 @@ export class MaciService {
    * @param args publish messages dto
    * @returns success or not
    */
-    async saveMessageBatches(args: Omit<MessageBatchDto, "ipfsHash">[]): Promise<MessageBatch[]> {
+  async saveMessageBatches(args: Omit<MessageBatchDto, "ipfsHash">[]): Promise<MessageBatch[]> {
       const validationErrors = await Promise.all(args.map((values) => validate(values))).then((result) =>
         result.reduce((acc, errors) => {
           acc.push(...errors);
@@ -101,7 +109,7 @@ export class MaciService {
   
       if (validationErrors.length > 0) {
         this.logger.error(`Validation error:`, validationErrors);
-  
+        console.error(validationErrors)
         throw new Error("Validation error");
       }
   
@@ -131,12 +139,23 @@ export class MaciService {
         })),
         "maciContractAddress",
       );
+      console.log("🚀 ~ MaciService ~ saveMessageBatches ~ pollId:", pollId)
+      console.log("🚀 ~ MaciService ~ saveMessageBatches ~ maciAddress:", maciAddress)
   
-      const { getDefaultSigner, relayMessages } = await import("maci-sdk");
-      const signer = await getDefaultSigner();
+      const { relayMessages } = await import("maci-sdk");
+      let provider : Provider
+      let coordinatorWallet : Wallet
+      if (process.env.NODE_ENV === "test") {
+        const [signer] = await hardhat.ethers.getSigners();
+        provider = signer.provider
+        coordinatorWallet = signer
+      }else{
+         provider = new JsonRpcProvider(this.configService.get<string>('PROVIDER_URL'))
+         coordinatorWallet = new Wallet(this.configService.get<string>('SIGNER_PK') as string,provider)
+      }
   
       const bytes32IpfsHash = await this.ipfsService.cidToBytes32(ipfsHash);
-      await relayMessages({ maciAddress, pollId, ipfsHash: bytes32IpfsHash, messages: allMessages, signer });
+      await relayMessages({ maciAddress, pollId, ipfsHash: bytes32IpfsHash, messages: allMessages, signer:coordinatorWallet });
   
       return messageBatches;
     }
