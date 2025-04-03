@@ -15,7 +15,6 @@ import { MessageBatchRepository } from "./repository/messageBatch.repository.js"
 import type { RootFilterQuery } from "mongoose";
 import { IpfsService } from "../ipfs/ipfs.service.js";
 import hardhat from "hardhat";
-import { Signer,Provider, Wallet,JsonRpcProvider,Contract } from "ethers";
 
 
 
@@ -66,18 +65,12 @@ export class MaciService {
    * @returns success or not
    */
   async saveMessages(args: PublishMessagesDto): Promise<Message[]> {
-    let provider : Provider
-    let coordinatorWallet : Wallet | Signer
-    if (process.env.NODE_ENV === "test") {
-      const [signer] = await hardhat.ethers.getSigners();
-      provider = signer.provider
-    }else{
-       provider = new JsonRpcProvider(this.configService.get<string>('PROVIDER_URL'))
-    }
+    const [signer] = await hardhat.ethers.getSigners();
 
-    const maciContract = new Contract(args.maciContractAddress, MACIFactory.abi, provider) as unknown as MACI;
+    const maciContract = MACIFactory.connect(args.maciContractAddress, signer);
     const pollAddresses = await maciContract.polls(args.poll);
-    const pollContract = new Contract(pollAddresses.poll, PollFactory.abi, provider) as unknown as Poll;
+    const pollContract = PollFactory.connect(pollAddresses.poll, signer);
+
 
     const hashes = await Promise.all(
       args.messages.map(({ data, publicKey }) =>
@@ -139,23 +132,12 @@ export class MaciService {
         })),
         "maciContractAddress",
       );
-      console.log("🚀 ~ MaciService ~ saveMessageBatches ~ pollId:", pollId)
-      console.log("🚀 ~ MaciService ~ saveMessageBatches ~ maciAddress:", maciAddress)
   
       const { relayMessages } = await import("maci-sdk");
-      let provider : Provider
-      let coordinatorWallet : Wallet
-      if (process.env.NODE_ENV === "test") {
-        const [signer] = await hardhat.ethers.getSigners();
-        provider = signer.provider
-        coordinatorWallet = signer
-      }else{
-         provider = new JsonRpcProvider(this.configService.get<string>('PROVIDER_URL'))
-         coordinatorWallet = new Wallet(this.configService.get<string>('SIGNER_PK') as string,provider)
-      }
-  
+      const [signer] = await hardhat.ethers.getSigners();
+
       const bytes32IpfsHash = await this.ipfsService.cidToBytes32(ipfsHash);
-      await relayMessages({ maciAddress, pollId, ipfsHash: bytes32IpfsHash, messages: allMessages, signer:coordinatorWallet });
+      await relayMessages({ maciAddress, pollId, ipfsHash: bytes32IpfsHash, messages: allMessages, signer:signer });
   
       return messageBatches;
     }
