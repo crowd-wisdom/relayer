@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 require("@nomicfoundation/hardhat-toolbox");
+require("@nomicfoundation/hardhat-ethers");
 const dotenv = require("dotenv");
 
 const path = require("path");

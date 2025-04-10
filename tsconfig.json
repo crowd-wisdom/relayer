@@ -21,11 +21,12 @@
     "isolatedModules": true,
     "allowJs": true,
     "esModuleInterop": true,
-    "paths": {
-      "ethers": [
-        "node_modules/ethers/lib.commonjs/index.js"
-      ]
-    }
+    "resolveJsonModule": true
+    // "paths": {
+    //   "ethers": [
+    //     "node_modules/ethers/lib.commonjs/index.js"
+    //   ]
+    // }
   },
   "include": [
     "./src",
