@@ -10,7 +10,7 @@ dotenv.config();
 const parentDir = __dirname.includes("build") ? ".." : "";
 
 module.exports = {
-  defaultNetwork: "hardhat",
+  defaultNetwork: process.env.NETWORK,
   networks: {
     localhost: {
       url: process.env.RELAYER_RPC_URL || "",
