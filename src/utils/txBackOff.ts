@@ -50,11 +50,6 @@ export class TxBackoffClient {
         nonce
       };
 
-      const simulationError = await this.simulateTx(tx);
-      if (simulationError) {
-        throw new Error(`⚠️ Simulation failed: ${simulationError}`);
-      }
-
       const txResponse = await this.wallet.sendTransaction(tx);
 
       this.logger.log(`🔁 Intent ${retries + 1} - Send tx with nonce ${nonce}: ${txResponse.hash}`);
