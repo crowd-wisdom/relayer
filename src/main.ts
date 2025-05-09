@@ -7,13 +7,14 @@ async function bootstrap() {
   const { AppModule } = await import("./app.module.js");
   const app = await NestFactory.create(AppModule, {
     logger: ["log", "fatal", "error", "warn"],
+    cors:false
   });
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const config = new DocumentBuilder()
     .setTitle('CrowdWisdom Relayer')
     .setDescription('CrowdWisdom Relayer Description')
     .setVersion('1.0')
-    .addBearerAuth()
+    //.addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
