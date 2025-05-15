@@ -1,10 +1,14 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEnum, IsEthereumAddress, IsInt, IsOptional, IsString, Length, Max, Min } from "class-validator";
+import { EMode } from "maci-sdk";
+import { IsEnum, IsEthereumAddress, IsInt, IsOptional, IsString, Length, Max, Min } from "class-validator";
 
 import type { Hex } from "viem";
 
 import { ESupportedNetworks } from "../../common/networks.js";
 
+/**
+ * Data transfer object for generate proof
+ */
 /**
  * Data transfer object for generate proof
  */
@@ -32,24 +36,14 @@ export class GenerateProofDto {
   maciContractAddress!: string;
 
   /**
-   * Tally contract address
+   * Voting mode
    */
   @ApiProperty({
-    description: "Tally contract address",
-    type: String,
+    description: "Voting mode (qv: 0, non-qv: 1, full: 2)",
+    type: Number,
   })
-  @IsEthereumAddress()
-  tallyContractAddress!: string;
-
-  /**
-   * Whether to use Qv or NonQv
-   */
-  @ApiProperty({
-    description: "Whether to use quadratic voting or not",
-    type: Boolean,
-  })
-  @IsBoolean()
-  useQuadraticVoting!: boolean;
+  @IsEnum(EMode)
+  mode!: EMode;
 
   /**
    * Encrypted coordinator private key with RSA public key (see .env.example)
@@ -104,6 +98,34 @@ export class GenerateProofDto {
   @Max(1000)
   @IsOptional()
   blocksPerBatch?: number;
+
+  @ApiProperty({
+    description: "Session key address",
+    type: String,
+    required: false,
+  })
+  @IsOptional()
+  @IsEthereumAddress()
+  sessionKeyAddress?: Hex;
+
+  @ApiProperty({
+    description: "Approval",
+    type: String,
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  approval?: string;
+
+  /**
+   * Chain Name
+   */
+  @ApiProperty({
+    description: "Chain to which to deploy the contract(s)",
+    enum: ESupportedNetworks,
+  })
+  @IsEnum(ESupportedNetworks)
+  chain!: ESupportedNetworks;
 }
 
 /**

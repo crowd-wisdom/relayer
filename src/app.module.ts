@@ -9,6 +9,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MaciProofModule } from './maci-proof/maci-proof.module';
+import { CryptoModule } from './crypto/crypto.module';
+import { FileModule } from './file/file.module';
 
 
 @Module({
@@ -39,7 +41,7 @@ import { MaciProofModule } from './maci-proof/maci-proof.module';
         dbName: config.get('MONGODB_DATABASE'),
       };
     },
-  }),ConfigModule.forRoot(),SemaphoreModule, MaciModule,IpfsModule,HealthModule,MaciModule, MaciProofModule],
+  }),ConfigModule.forRoot(),SemaphoreModule, MaciModule,IpfsModule,HealthModule,MaciModule, MaciProofModule, CryptoModule, FileModule],
   controllers: [MaciController]
 })
 export class AppModule {}

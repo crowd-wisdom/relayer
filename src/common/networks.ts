@@ -19,7 +19,7 @@ import {
     sepolia,
   } from "viem/chains";
   
-  import { ErrorCodes } from "./erros.js";
+  import { ErrorCodes } from "./error.js";
   
   export enum ESupportedNetworks {
     ETHEREUM = "mainnet",
