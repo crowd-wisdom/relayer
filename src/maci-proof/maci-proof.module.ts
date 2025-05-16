@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { MaciProofService } from './maci-proof.service';
-import { MaciProofController } from './maci-proof.controller';
+import { MaciProofService } from './maci-proof.service.js';
+import { MaciProofController } from './maci-proof.controller.js';
 
 @Module({
   providers: [MaciProofService],

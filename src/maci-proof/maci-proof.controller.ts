@@ -3,9 +3,9 @@ import { Body, Controller, Get, HttpException, HttpStatus, Logger, Post, UseGuar
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import type { IGenerateData, IMergeArgs } from "./types.js";
-import type { ITallyData } from "maci-sdk";
+import type { ITallyData } from "@maci-protocol/sdk";
 
-import { AccountSignatureGuard, Public } from "../auth/AccountSignatureGuard.service";
+import { AccountSignatureGuard, Public } from "../auth/accountSignatureGuard.service.js";
 import { FileService } from "../file/file.service.js";
 import { IGetPublicKeyData } from "../file/types.js";
 

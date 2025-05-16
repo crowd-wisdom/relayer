@@ -1,4 +1,4 @@
-import { MACI__factory as MACIFactory, Poll__factory as PollFactory } from "maci-contracts";
+import { MACI__factory as MACIFactory, Poll__factory as PollFactory } from "@maci-protocol/contracts";
 import { CanActivate, ExecutionContext, Injectable,CustomDecorator, SetMetadata,Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Reflector } from "@nestjs/core";
 import { validate } from "class-validator";

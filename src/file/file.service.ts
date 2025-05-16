@@ -1,4 +1,4 @@
-import { EMode } from "maci-sdk";
+import { EMode } from "@maci-protocol/sdk";
 import { Injectable, Logger } from "@nestjs/common";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync.js";
@@ -94,7 +94,7 @@ export class FileService {
   }
 
   /**
-   * Get zkey, wasm and witgen filepaths for zkey set
+   * Get zkey, wasm and witness generator filepaths for zkey set
    *
    * @param name - zkey set name
    * @param mode - voting mode
@@ -107,24 +107,27 @@ export class FileService {
     const params = name.slice(index + 1);
     const modePrefixes = {
       [EMode.QV]: "",
-      [EMode.NON_QV]: "NonQv"
+      [EMode.NON_QV]: "NonQv",
+      [EMode.FULL]: "Full",
     };
 
     const filename = `${type}${modePrefixes[mode]}_${params}`;
 
     const zkey = path.resolve(root, `${filename}/${filename}.0.zkey`);
     const wasm = path.resolve(root, `${filename}/${filename}_js/${filename}.wasm`);
-    const witgen = path.resolve(root, `${filename}/${filename}_cpp/${filename}`);
+    const witnessGenerator = path.resolve(root, `${filename}/${filename}_cpp/${filename}`);
 
-    if (!fs.existsSync(zkey) || (!fs.existsSync(wasm) && !fs.existsSync(witgen))) {
-      this.logger.error(`Error: ${ErrorCodes.FILE_NOT_FOUND}, zkey: ${zkey}, wasm: ${wasm}, witgen: ${witgen}`);
+    if (!fs.existsSync(zkey) || (!fs.existsSync(wasm) && !fs.existsSync(witnessGenerator))) {
+      this.logger.error(
+        `Error: ${ErrorCodes.FILE_NOT_FOUND}, zkey: ${zkey}, wasm: ${wasm}, witnessGenerator: ${witnessGenerator}`,
+      );
       throw new Error(ErrorCodes.FILE_NOT_FOUND.toString());
     }
 
     return {
       zkey,
       wasm,
-      witgen,
+      witnessGenerator,
     };
   }
 }

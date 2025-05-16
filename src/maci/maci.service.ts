@@ -2,10 +2,10 @@ import { Injectable, Logger } from "@nestjs/common";
 import { validate } from "class-validator";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { ConfigService } from '@nestjs/config';
-import { PubKey } from "maci-domainobjs";
+import { PublicKey } from "@maci-protocol/domainobjs";
 import flatten from "lodash/flatten.js";
 import uniqBy from "lodash/uniqBy.js";
-import { MACI, MACI__factory as MACIFactory, Poll, Poll__factory as PollFactory} from "maci-contracts";
+import { MACI, MACI__factory as MACIFactory, Poll, Poll__factory as PollFactory} from "@maci-protocol/contracts";
 import type { PublishMessagesDto } from "./dto/message.dto.js";
 import { MessageRepository } from "./repository/message.repository.js";
 import { Message } from "./schemas/message.schema.js";
@@ -74,7 +74,7 @@ export class MaciService {
 
     const hashes = await Promise.all(
       args.messages.map(({ data, publicKey }) =>
-        pollContract.hashMessageAndEncPubKey({ data }, PubKey.deserialize(publicKey).asContractParam()),
+        pollContract.hashMessageAndPublicKey({ data }, PublicKey.deserialize(publicKey).asContractParam()),
       ),
     );
 
@@ -111,7 +111,7 @@ export class MaciService {
         data: message.data,
         hash: message.hash,
         maciContractAddress: message.maciContractAddress,
-        publicKey: PubKey.deserialize(message.publicKey).asArray().map(String),
+        publicKey: PublicKey.deserialize(message.publicKey).asArray().map(String),
       }));
   
       const ipfsHash = await this.ipfsService.add(allMessages).catch((error) => {

@@ -8,9 +8,11 @@ import { HealthModule } from './health/health.module.js';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MaciProofModule } from './maci-proof/maci-proof.module';
-import { CryptoModule } from './crypto/crypto.module';
-import { FileModule } from './file/file.module';
+import { MaciProofModule } from './maci-proof/maci-proof.module.js';
+import { CryptoModule } from './crypto/crypto.module.js';
+import { FileModule } from './file/file.module.js';
+import { SessionKeysModule } from './session-keys/session-keys.module.js';
+
 
 
 @Module({
@@ -41,7 +43,7 @@ import { FileModule } from './file/file.module';
         dbName: config.get('MONGODB_DATABASE'),
       };
     },
-  }),ConfigModule.forRoot(),SemaphoreModule, MaciModule,IpfsModule,HealthModule,MaciModule, MaciProofModule, CryptoModule, FileModule],
+  }),ConfigModule.forRoot(),SemaphoreModule, MaciModule,IpfsModule,HealthModule,MaciModule, MaciProofModule, CryptoModule, FileModule, SessionKeysModule],
   controllers: [MaciController]
 })
 export class AppModule {}

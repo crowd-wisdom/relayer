@@ -1,4 +1,4 @@
-import { Keypair, PrivKey, PubKey } from "maci-domainobjs";
+import { Keypair, PrivateKey, PublicKey } from "@maci-protocol/domainobjs";
 import {
   Deployment,
   EContracts,
@@ -7,8 +7,8 @@ import {
   getPoll,
   mergeSignups,
   EMode,
-} from "maci-sdk";
-import { IProof, ITallyData, generateProofs, proveOnChain } from "maci-sdk";
+} from "@maci-protocol/sdk";
+import { IProof, ITallyData, generateProofs, proveOnChain } from "@maci-protocol/sdk";
 import { Logger, Injectable } from "@nestjs/common";
 import hre from "hardhat";
 
@@ -20,7 +20,7 @@ import type { IGenerateArgs, IGenerateData, IMergeArgs, ISubmitProofsArgs } from
 import { ErrorCodes } from "../common/error.js";
 import { CryptoService } from "../crypto/crypto.service.js";
 import { FileService } from "../file/file.service.js";
-import { SessionKeysService } from "../sessionKeys/sessionKeys.service";
+import { SessionKeysService } from "../sessionKeys/sessionKeys.service.js";
 
 @Injectable()
 export class MaciProofService {
@@ -98,19 +98,19 @@ export class MaciProofService {
         name: EContracts.Poll,
         address: pollData.address,
       });
-      const coordinatorPublicKey = await pollContract.coordinatorPubKey();
+      const coordinatorPublicKey = await pollContract.coordinatorPublicKey();
 
       const { privateKey } = await this.fileService.getPrivateKey();
-      const maciPrivateKey = PrivKey.deserialize(
+      const maciPrivateKey = PrivateKey.deserialize(
         this.cryptoService.decrypt(privateKey, encryptedCoordinatorPrivateKey),
       );
       const coordinatorKeypair = new Keypair(maciPrivateKey);
-      const publicKey = new PubKey([
+      const publicKey = new PublicKey([
         BigInt(coordinatorPublicKey.x.toString()),
         BigInt(coordinatorPublicKey.y.toString()),
       ]);
 
-      if (!coordinatorKeypair.pubKey.equals(publicKey)) {
+      if (!coordinatorKeypair.publicKey.equals(publicKey)) {
         this.logger.error(`Error: ${ErrorCodes.PRIVATE_KEY_MISMATCH}, wrong private key`);
         throw new Error(ErrorCodes.PRIVATE_KEY_MISMATCH.toString());
       }
@@ -135,13 +135,13 @@ export class MaciProofService {
         endBlock,
         blocksPerBatch,
         rapidsnark: process.env.COORDINATOR_RAPIDSNARK_EXE,
-        useQuadraticVoting:mode === EMode.QV ? true : false,
-        tallyZkey: tally.zkey,
-        tallyWitgen: tally.witgen,
-        tallyWasm: tally.wasm,
-        processZkey: messageProcessor.zkey,
-        processWitgen: messageProcessor.witgen,
-        processWasm: messageProcessor.wasm,
+        mode,
+        voteTallyZkey: tally.zkey,
+        voteTallyWitnessGenerator: tally.witnessGenerator,
+        voteTallyWasm: tally.wasm,
+        messageProcessorZkey: messageProcessor.zkey,
+        messageProcessorWitnessGenerator: messageProcessor.witnessGenerator,
+        messageProcessorWasm: messageProcessor.wasm,
         tallyFile: path.resolve("./tally.json"),
       });
 
