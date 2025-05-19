@@ -20,7 +20,7 @@ import type { IGenerateArgs, IGenerateData, IMergeArgs, ISubmitProofsArgs } from
 import { ErrorCodes } from "../common/error.js";
 import { CryptoService } from "../crypto/crypto.service.js";
 import { FileService } from "../file/file.service.js";
-import { SessionKeysService } from "../sessionKeys/sessionKeys.service.js";
+import { SessionKeysService } from "../session-keys/session-keys.service.js";
 
 @Injectable()
 export class MaciProofService {
