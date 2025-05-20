@@ -16,7 +16,7 @@ export class TxBackoffClient {
     retryDelayMs: number;
   constructor({
     providerUrl = process.env.RELAYER_RPC_URL,
-    privateKey = process.env.SIGNER_PK,
+    privateKey = process.env.SIGNER_PK as string,
     maxRetries = 3,
     gasBumpFactor = 1.2,
     retryDelayMs = 15000
@@ -38,7 +38,7 @@ export class TxBackoffClient {
     }
   }
 
-  async sendTx(txRequest:TransactionRequest) : Promise<TransactionReceipt> {
+  async sendTx(txRequest:TransactionRequest) : Promise<TransactionReceipt | null > {
     let nonce = await this.provider.getTransactionCount(this.wallet.address, "latest");
     let retries = 0;
     let gasPrice = await getGasCost(this.provider);
@@ -56,12 +56,12 @@ export class TxBackoffClient {
 
       try {
         const receipt = await txResponse.wait();
-        this.logger.log(`✅ Confirm in block ${receipt.blockNumber}: ${receipt.hash}`);
+        this.logger.log(`✅ Confirm in block ${receipt?.blockNumber}: ${receipt?.hash}`);
         return receipt;
       } catch {
         retries++;
         if (retries > this.maxRetries) break;
-        gasPrice = gasPrice * BigInt(Math.floor(this.gasBumpFactor * 100)) / 100n;
+        gasPrice = gasPrice ? gasPrice * BigInt(Math.floor(this.gasBumpFactor * 100)) / 100n : 0n;
         this.logger.warn("⏳ It was not mined, trying again with more gas...");
         await new Promise(res => setTimeout(res, this.retryDelayMs));
       }

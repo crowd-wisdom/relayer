@@ -21,6 +21,7 @@ import { ErrorCodes } from "../common/error.js";
 import { CryptoService } from "../crypto/crypto.service.js";
 import { FileService } from "../file/file.service.js";
 import { SessionKeysService } from "../session-keys/session-keys.service.js";
+import hardhat from "hardhat";
 
 @Injectable()
 export class MaciProofService {
@@ -87,12 +88,13 @@ export class MaciProofService {
     options?: IGenerateProofsOptions,
   ): Promise<IGenerateData> {
     try {
-      const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval);
-
+      //const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval) as Signer;
+      const [signer] = await hardhat.ethers.getSigners();
       const pollData = await getPoll({
         maciAddress: maciContractAddress,
-        pollId: poll,
         signer,
+        provider: signer.provider,
+        pollId: poll,
       });
       const pollContract = await this.deployment.getContract<Poll>({
         name: EContracts.Poll,
@@ -162,11 +164,11 @@ export class MaciProofService {
    * @returns whether the proofs were successfully merged
    */
   async merge({ maciContractAddress, pollId, approval, sessionKeyAddress, chain }: IMergeArgs): Promise<boolean> {
-    const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval);
-
+    //const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval)
+    const [signer] = await hardhat.ethers.getSigners();
     await mergeSignups({
+      pollId: BigInt(pollId),     
       maciAddress: maciContractAddress,
-      pollId: BigInt(pollId),
       signer,
     });
 
@@ -185,8 +187,8 @@ export class MaciProofService {
     approval,
     chain,
   }: ISubmitProofsArgs): Promise<ITallyData> {
-    const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval);
-
+    //const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval);
+    const [signer] = await hardhat.ethers.getSigners();
     const tallyData = await proveOnChain({
       pollId: BigInt(pollId),
       maciAddress: maciContractAddress,

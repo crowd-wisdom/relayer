@@ -1,5 +1,5 @@
 import { ZeroAddress } from "ethers";
-import { Keypair } from "maci-domainobjs";
+import { Keypair } from "@maci-protocol/domainobjs";
 
 import type { ICreateMessages } from "./types.js";
 
@@ -14,7 +14,7 @@ const defaultMessageBatch = new MessageBatchDto();
 const defaultMessage = new Message();
 defaultMessage.data = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 defaultMessage.hash = "0";
-defaultMessage.publicKey = keypair.pubKey.serialize();
+defaultMessage.publicKey = keypair.publicKey.serialize();
 defaultMessage.maciContractAddress = ZeroAddress;
 defaultMessage.poll = 0;
 defaultMessageBatch.messages = [defaultMessage];
@@ -28,7 +28,7 @@ defaultGetMessageBatchesDto.maciContractAddress = ZeroAddress;
 defaultGetMessageBatchesDto.poll = 0;
 defaultGetMessageBatchesDto.ipfsHashes = [defaultIpfsHash];
 defaultGetMessageBatchesDto.messageHashes = ["0"];
-defaultGetMessageBatchesDto.publicKeys = [keypair.pubKey.serialize()];
+defaultGetMessageBatchesDto.publicKeys = [keypair.publicKey.serialize()];
 
 export const defaultMessages = defaultMessageBatches[0].messages;
 
@@ -38,7 +38,7 @@ defaultSaveMessagesDto.poll = 0;
 defaultSaveMessagesDto.messages = [
   {
     data: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-    publicKey: keypair.pubKey.serialize(),
+    publicKey: keypair.publicKey.serialize(),
   },
 ];
 

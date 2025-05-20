@@ -7,7 +7,7 @@ import { createPublicClient, http, type Hex } from "viem";
 import { createBundlerClient } from "viem/account-abstraction";
 import { privateKeyToAccount } from "viem/accounts";
 
-import type { BundlerClientType, KernelClientType, PublicClientHTTPType,PublicClientType } from "./types.js";
+import type { BundlerClientType, KernelClientType, PublicClientHTTPType } from "./types.js";
 
 import { getAlchemyRpcUrl } from "./chain.js";
 import { ErrorCodes } from "./error.js";

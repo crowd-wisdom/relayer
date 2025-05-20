@@ -141,6 +141,9 @@ importers:
       '@types/jest':
         specifier: npm:@types/jest@^29.5.14
         version: 29.5.14
+      '@types/lodash':
+        specifier: ^4.17.16
+        version: 4.17.16
       '@types/lowdb':
         specifier: npm:@types/lowdb@^1.0.15
         version: 1.0.15

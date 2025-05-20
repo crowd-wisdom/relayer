@@ -5,8 +5,11 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
 import type { AASigner } from "@maci-protocol/contracts";
 import type { Hex } from "viem";
+import type { KernelClientType }  from "../common/types.js";
 
-import { ErrorCodes, ESupportedNetworks, getSigner, KernelClientType } from "../common";
+import { ErrorCodes} from "../common/error.js";
+import { ESupportedNetworks } from "../common/networks.js";
+import { getSigner } from "../common/chain.js";
 import { getKernelClient } from "../common/accountAbstraction.js";
 import { FileService } from "../file/file.service.js";
 

@@ -3,9 +3,8 @@ import { validate } from "class-validator";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { ConfigService } from '@nestjs/config';
 import { PublicKey } from "@maci-protocol/domainobjs";
-import flatten from "lodash/flatten.js";
-import uniqBy from "lodash/uniqBy.js";
-import { MACI, MACI__factory as MACIFactory, Poll, Poll__factory as PollFactory} from "@maci-protocol/contracts";
+import uniqBy from "lodash";
+import { IIpfsMessage, MACI, MACI__factory as MACIFactory, Poll, Poll__factory as PollFactory} from "@maci-protocol/contracts";
 import type { PublishMessagesDto } from "./dto/message.dto.js";
 import { MessageRepository } from "./repository/message.repository.js";
 import { Message } from "./schemas/message.schema.js";
@@ -106,11 +105,11 @@ export class MaciService {
         throw new Error("Validation error");
       }
   
-      const allMessages = flatten(args.map((item) => item.messages)).map((message) => ({
+      const allMessages : IIpfsMessage[] = args.map((item) => item.messages).flat().map((message : any) => ({
         poll: message.poll,
         data: message.data,
         hash: message.hash,
-        maciContractAddress: message.maciContractAddress,
+        maciAddress: message.maciContractAddress,
         publicKey: PublicKey.deserialize(message.publicKey).asArray().map(String),
       }));
   
@@ -125,15 +124,14 @@ export class MaciService {
           throw error;
         });
   
-      const [{ maciAddress, pollId }] = uniqBy(
-        allMessages.map(({ maciContractAddress, poll }) => ({
+      const [{ maciAddress, pollId }] : any = uniqBy(
+        allMessages.map(({ maciContractAddress, poll } : any ) => ({
           maciAddress: maciContractAddress,
           pollId: poll,
-        })),
-        "maciContractAddress",
+        }))
       );
   
-      const { relayMessages } = await import("maci-sdk");
+      const { relayMessages } = await import("@maci-protocol/sdk");
       const [signer] = await hardhat.ethers.getSigners();
 
       const bytes32IpfsHash = await this.ipfsService.cidToBytes32(ipfsHash);

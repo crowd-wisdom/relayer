@@ -14,7 +14,7 @@ import {
   MaxLength,
   MinLength,
 } from "class-validator";
-import { Message } from "maci-domainobjs";
+import { Message } from "@maci-protocol/domainobjs";
 
 import { PublicKeyValidator } from "../validation.js";
 

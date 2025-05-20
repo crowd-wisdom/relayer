@@ -41,7 +41,7 @@ export class SemaphoreService {
         const txBackOff = new TxBackoffClient()
 
         const result = await txBackOff.sendTx(transaction)
-        options?.onComplete?.(result.hash);
+        result ? options?.onComplete?.(result.hash) : options?.onFail?.(new Error("Error to generate Tx"))
         return result
     }
 }

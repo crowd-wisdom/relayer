@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { expect, jest } from "@jest/globals";
 import { Test } from "@nestjs/testing";
 
 import { HealthController } from "../health.controller.js";
