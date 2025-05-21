@@ -12,6 +12,7 @@ import { MaciProofModule } from './maci-proof/maci-proof.module.js';
 import { CryptoModule } from './crypto/crypto.module.js';
 import { FileModule } from './file/file.module.js';
 import { SessionKeysModule } from './session-keys/session-keys.module.js';
+import { DeployerModule } from './deployer/deployer.module';
 
 
 
@@ -43,7 +44,7 @@ import { SessionKeysModule } from './session-keys/session-keys.module.js';
         dbName: config.get('MONGODB_DATABASE'),
       };
     },
-  }),ConfigModule.forRoot(),SemaphoreModule, MaciModule,IpfsModule,HealthModule,MaciModule, MaciProofModule, CryptoModule, FileModule, SessionKeysModule],
+  }),ConfigModule.forRoot(),SemaphoreModule, MaciModule,IpfsModule,HealthModule,MaciModule, MaciProofModule, CryptoModule, FileModule, SessionKeysModule, DeployerModule],
   controllers: [MaciController]
 })
 export class AppModule {}
