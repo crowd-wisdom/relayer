@@ -55,7 +55,7 @@ const mockIpfsService = {
 
 const mockConfigService = {  
   get: jest.fn().mockImplementation((key: string) => {
-  if (key === 'SIGNER_PK') {
+  if (key === 'PRIVATE_KEY') {
     return '54b873583b06adad015e9e3f6496011ad62aa6330728bbcedea2a1f17fdb396b';
   }else if(key === 'PROVIDER_URL'){
     return 'http://localhost:8545'

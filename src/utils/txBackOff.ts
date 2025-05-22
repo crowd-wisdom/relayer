@@ -16,7 +16,7 @@ export class TxBackoffClient {
     retryDelayMs: number;
   constructor({
     providerUrl = process.env.RELAYER_RPC_URL,
-    privateKey = process.env.SIGNER_PK as string,
+    privateKey = process.env.PRIVATE_KEY as string,
     maxRetries = 3,
     gasBumpFactor = 1.2,
     retryDelayMs = 15000

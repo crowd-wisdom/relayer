@@ -15,6 +15,7 @@
   ],
   "scripts": {
     "build": "nest build",
+    "run:node": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));'",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -26,12 +27,17 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "download-zkeys:test:relayer": "cd maci && pnpm run download-zkeys:test:relayer"
+    "download-zkeys:test:relayer": "cd maci && pnpm run download-zkeys:test:relayer",
+    "types": "tsc -p tsconfig.json --noEmit",
+    "generate-maci-keypair": "pnpm run:node ./scripts/generateMaciKeypair.ts",
+    "generate-keypair": "pnpm run run:node ./scripts/generateKeypair.ts",
+    "get-auth-header": "pnpm run run:node ./scripts/getAuthHeader.ts"
   },
   "dependencies": {
     "@helia/json": "npm:@helia/json@^4.0.2",
     "@maci-protocol/contracts": "^3.0.0",
     "@maci-protocol/domainobjs": "^3.0.0",
+    "@maci-protocol/crypto": "^3.0.0",
     "@maci-protocol/sdk": "^1.0.0",
     "@maci-protocol/testing": "^1.0.0",
     "@nestjs/common": "npm:@nestjs/common@^11.0.10",

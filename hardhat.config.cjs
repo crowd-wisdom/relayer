@@ -14,7 +14,7 @@ module.exports = {
   networks: {
     localhost: {
       url: process.env.RELAYER_RPC_URL || "",
-      accounts: [process.env.SIGNER_PK],
+      accounts: [process.env.PRIVATE_KEY],
       loggingEnabled: false,
     },
     hardhat: {

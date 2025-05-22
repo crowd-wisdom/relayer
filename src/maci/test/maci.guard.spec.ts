@@ -9,7 +9,7 @@ import { ZeroAddress } from "ethers";
 
 dotenv.config();
 
-jest.mock("@maci-protocol/typechain-types", (): unknown => ({
+jest.mock("@maci-protocol/contracts/typechain-types", (): unknown => ({
   MACI__factory: {
     connect: jest.fn(),
   },
