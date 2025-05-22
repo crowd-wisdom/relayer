@@ -1,6 +1,6 @@
-import { jest } from "@jest/globals";
+import { beforeAll, expect, jest } from "@jest/globals";
 import { ZeroAddress } from "ethers";
-import { TestingClass } from "maci-testing";
+import { TestingClass } from "@maci-protocol/testing";
 import type { MessageRepository } from "../repository/message.repository.js";
 
 import { MaciService } from "../maci.service.js"
@@ -14,16 +14,16 @@ import { MessageBatchDto } from "../dto/messageBatch.dto.js";
 import {
   pollJoinedWasm,
   pollJoinedZkey,
-  pollWasm,
-  type TApp,
-  tallyVotesZkeyPathNonQv,
   pollJoiningZkey,
-  processMessagesZkeyPathNonQv,
-  pollWitgen,
+  pollWasm,
+  pollWitnessGenerator,
+  messageProcessorZkeyPathNonQv,
   rapidsnark,
+  voteTallyZkeyPathNonQv,
+  type TApp,
 } from "./constants.js";
 
-jest.mock("maci-sdk", (): unknown => ({
+jest.mock("@maci-protocol/sdk", (): unknown => ({
   relayMessages: jest.fn()
 }));
 
@@ -78,16 +78,15 @@ describe("MessageTest", () => {
     const testDeploy = await TestingClass.getInstance({
       pollJoiningZkeyPath: pollJoiningZkey,
       pollJoinedZkeyPath: pollJoinedZkey,
-      processMessagesZkeyPath: processMessagesZkeyPathNonQv,
-      tallyVotesZkeyPath: tallyVotesZkeyPathNonQv,
+      messageProcessorZkeyPath: messageProcessorZkeyPathNonQv,
+      voteTallyZkeyPath: voteTallyZkeyPathNonQv,
       pollWasm,
-      pollWitgen,
+      pollWitnessGenerator,
       rapidsnark,
     });
-
     const poll = testDeploy.contractsData.maciState!.polls.get(0n);
 
-    poll!.updatePoll(BigInt(testDeploy.contractsData.maciState!.pubKeys.length));
+    poll!.updatePoll(BigInt(testDeploy.contractsData.maciState!.publicKeys.length));
 
     const [user] = testDeploy.contractsData.users!;
 
@@ -95,12 +94,11 @@ describe("MessageTest", () => {
 
     maciContractAddress = testDeploy.contractsData.maciContractAddress!;
 
-    circuitInputs = poll!.joinedCircuitInputs({
-      maciPrivKey: user.keypair.privKey,
+    const circuitInputs = poll!.joinedCircuitInputs({
+      maciPrivateKey: user.keypair.privateKey,
       stateLeafIndex: user.stateLeafIndex!,
       voiceCreditsBalance: user.voiceCreditBalance,
-      joinTimestamp: user.timestamp!,
-    }) as unknown as typeof circuitInputs;
+    });
   })
 
   beforeEach(async () => {
@@ -206,16 +204,16 @@ describe("MessageBatchTest",() => {
     const testDeploy = await TestingClass.getInstance({
       pollJoiningZkeyPath: pollJoiningZkey,
       pollJoinedZkeyPath: pollJoinedZkey,
-      processMessagesZkeyPath: processMessagesZkeyPathNonQv,
-      tallyVotesZkeyPath: tallyVotesZkeyPathNonQv,
+      messageProcessorZkeyPath: messageProcessorZkeyPathNonQv,
+      voteTallyZkeyPath: voteTallyZkeyPathNonQv,
       pollWasm,
-      pollWitgen,
+      pollWitnessGenerator,
       rapidsnark,
     });
 
     const poll = testDeploy.contractsData.maciState!.polls.get(0n);
 
-    poll!.updatePoll(BigInt(testDeploy.contractsData.maciState!.pubKeys.length));
+    poll!.updatePoll(BigInt(testDeploy.contractsData.maciState!.publicKeys.length));
 
     const [user] = testDeploy.contractsData.users!;
 
@@ -224,10 +222,9 @@ describe("MessageBatchTest",() => {
     maciContractAddress = testDeploy.contractsData.maciContractAddress!;
 
     circuitInputs = poll!.joinedCircuitInputs({
-      maciPrivKey: user.keypair.privKey,
+      maciPrivateKey: user.keypair.privateKey,
       stateLeafIndex: user.stateLeafIndex!,
-      voiceCreditsBalance: user.voiceCreditBalance,
-      joinTimestamp: user.timestamp!,
+      voiceCreditsBalance: user.voiceCreditBalance
     }) as unknown as typeof circuitInputs;
   })
 

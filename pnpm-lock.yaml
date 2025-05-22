@@ -95,6 +95,9 @@ importers:
       ethers:
         specifier: npm:ethers@^6.13.5
         version: 6.14.1
+      fast-check:
+        specifier: ^4.1.1
+        version: 4.1.1
       hardhat:
         specifier: npm:hardhat@^2.22.19
         version: 2.24.0(ts-node@10.9.2(@types/node@22.15.19)(typescript@5.8.3))(typescript@5.8.3)
@@ -142,7 +145,7 @@ importers:
         specifier: npm:@types/jest@^29.5.14
         version: 29.5.14
       '@types/lodash':
-        specifier: ^4.17.16
+        specifier: npm:@types/lodash@^4.17.16
         version: 4.17.16
       '@types/lowdb':
         specifier: npm:@types/lowdb@^1.0.15

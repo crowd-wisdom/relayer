@@ -10,6 +10,7 @@ import {
 } from "@maci-protocol/sdk";
 import { IProof, ITallyData, generateProofs, proveOnChain } from "@maci-protocol/sdk";
 import { Logger, Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import hre from "hardhat";
 
 import fs from "fs";
@@ -203,4 +204,28 @@ export class MaciProofService {
 
     return tallyData;
   }
+
+
+      /**
+     * Generate proof,merge message and submit proof on onchain
+     *
+     * @param args publish messages dto
+     * @returns transaction and ipfs hashes
+     */
+      @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_HOUR, { name: "closePoll" })
+      async closePoll(): Promise<boolean> {
+        const maciAddress = process.env.MACI_ADDRESS
+        const messages = await this.messageRepository.find({ messageBatch: { $exists: false } });
+    
+        if (messages.length === 0) {
+          return false;
+        }
+    
+        await this.saveMessageBatches([{ messages }]).catch((error) => {
+          this.logger.error(`Save message batch error:`, error);
+          throw error;
+        });
+    
+        return true;
+      }
 }

@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { expect, jest } from "@jest/globals";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Test, TestingModule } from '@nestjs/testing';
 import { MaciController } from '../maci.controller.js';

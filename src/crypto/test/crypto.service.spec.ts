@@ -1,18 +1,42 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CryptoService } from '../crypto.service.js';
+import fc from "fast-check";
 
-describe('CryptoService', () => {
-  let service: CryptoService;
+import { generateKeyPairSync } from "crypto";
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [CryptoService],
-    }).compile();
+import { ErrorCodes } from "../../common/error.js";
+import { CryptoService } from "../crypto.service.js";
+import { expect } from "@jest/globals";
 
-    service = module.get<CryptoService>(CryptoService);
+describe("CryptoService", () => {
+  test("should throw encryption error if key is invalid", () => {
+    const service = new CryptoService();
+
+    expect(() => service.encrypt("", "")).toThrow(ErrorCodes.ENCRYPTION.toString());
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  test("should throw decryption error if key is invalid", () => {
+    const service = new CryptoService();
+
+    expect(() => service.decrypt("", "")).toThrow(ErrorCodes.DECRYPTION.toString());
+  });
+
+  test("should encrypt and decrypt properly", () => {
+    fc.assert(
+      fc.property(fc.string(), (text: string) => {
+        const service = new CryptoService();
+
+        const keypair = generateKeyPairSync("rsa", {
+          modulusLength: 2048,
+        });
+
+        const encryptedText = service.encrypt(keypair.publicKey.export({ type: "pkcs1", format: "pem" }), text);
+
+        const decryptedText = service.decrypt(
+          keypair.privateKey.export({ type: "pkcs1", format: "pem" }),
+          encryptedText,
+        );
+
+        return decryptedText === text;
+      }),
+    );
   });
 });

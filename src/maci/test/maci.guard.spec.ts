@@ -1,7 +1,7 @@
 import { MaciGuard,PUBLIC_METADATA_KEY, Public } from '../maci.guard.js';
-import { jest } from "@jest/globals";
-import { Keypair } from "maci-domainobjs";
-import { MACI__factory as MACIFactory, Poll__factory as PollFactory } from "maci-contracts";
+import { expect, jest } from "@jest/globals";
+import { Keypair } from "@maci-protocol/domainobjs";
+import { MACI__factory as MACIFactory, Poll__factory as PollFactory } from "@maci-protocol/contracts";
 import { HttpException, type ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import dotenv from "dotenv";
@@ -9,7 +9,7 @@ import { ZeroAddress } from "ethers";
 
 dotenv.config();
 
-jest.mock("maci-contracts/typechain-types", (): unknown => ({
+jest.mock("@maci-protocol/typechain-types", (): unknown => ({
   MACI__factory: {
     connect: jest.fn(),
   },
@@ -28,7 +28,7 @@ describe("MessageGuard", () => {
       messages: [
         {
           data: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-          publicKey: new Keypair().pubKey.serialize(),
+          publicKey: new Keypair().publicKey.serialize(),
         },
       ],
     },
