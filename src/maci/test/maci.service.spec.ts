@@ -248,15 +248,18 @@ describe("MessageBatchTest",() => {
       mockConfigService as unknown as ConfigService
     );
     defaultMessageBatches[0].messages[0].maciContractAddress = maciContractAddress
-    const result = await service.saveMessageBatches(defaultMessageBatches);
+    const result = await service.saveMessageBatches(defaultMessageBatches);  
     const messageBatches = await service.findMessageBatches({});
 
     expect(result).toStrictEqual(defaultMessageBatches);
     expect(messageBatches).toStrictEqual(defaultMessageBatches);
   });
+    
+    
+
 
   test("should throw an error if can't find message batches", async () => {
-    const error = new Error("error");
+    const error = new Error("Validation error");
 
     (mockMessageBatchRepository.find as jest.Mock).mockImplementation(() => Promise.reject(error));
 
@@ -271,7 +274,7 @@ describe("MessageBatchTest",() => {
   });
 
   test("should throw an error if can't save message batches", async () => {
-    const error = new Error("error");
+    const error = new Error("Validation error");
 
     (mockMessageBatchRepository.create as jest.Mock).mockImplementation(() => Promise.reject(error));
 
@@ -287,7 +290,7 @@ describe("MessageBatchTest",() => {
   
 
   test("should throw an error if can't update message batches to ipfs", async () => {
-    const error = new Error("error");
+    const error = new Error("Validation error");
 
     (mockIpfsService.add as jest.Mock).mockImplementation(() => Promise.reject(error));
 

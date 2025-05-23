@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SemaphoreService } from './semaphore.service';
+import { SemaphoreService } from './semaphore.service.js';
+import { expect } from '@jest/globals';
 
 describe('SemaphoreService', () => {
   let service: SemaphoreService;

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SessionKeysController } from '../session-keys.controller.js';
+import { expect } from '@jest/globals';
 
 describe('SessionKeysController', () => {
   let controller: SessionKeysController;

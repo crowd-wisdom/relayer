@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MaciProofService } from '../maci-proof.service.js';
+import { expect } from '@jest/globals';
 
 describe('MaciProofService', () => {
   let service: MaciProofService;

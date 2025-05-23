@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MaciProofController } from '../maci-proof.controller.js';
+import { expect } from '@jest/globals';
 
 describe('MaciProofController', () => {
   let controller: MaciProofController;

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeployerController } from '../deployer.controller.js';
+import { expect } from '@jest/globals';
 
 describe('DeployerController', () => {
   let controller: DeployerController;

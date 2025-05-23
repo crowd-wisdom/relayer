@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SemaphoreController } from './semaphore.controller';
+import { SemaphoreController } from './semaphore.controller.js';
+import { expect } from '@jest/globals';
 
 describe('SemaphoreController', () => {
   let controller: SemaphoreController;
