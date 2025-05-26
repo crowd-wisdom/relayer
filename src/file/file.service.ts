@@ -106,7 +106,7 @@ export class FileService {
     const type = name.slice(0, index);
     const params = name.slice(index + 1);
     const modePrefixes = {
-      [EMode.QV]: "",
+      [EMode.QV]: "Qv",
       [EMode.NON_QV]: "NonQv",
       [EMode.FULL]: "Full",
     };

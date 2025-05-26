@@ -17,7 +17,7 @@ async function bootstrap() {
     .setTitle('CrowdWisdom Relayer')
     .setDescription('CrowdWisdom Relayer Description')
     .setVersion('1.0')
-    //.addBearerAuth()
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
