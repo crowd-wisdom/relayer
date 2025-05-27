@@ -1,6 +1,7 @@
 import { MACI__factory as MACIFactory, Poll__factory as PollFactory } from "@maci-protocol/contracts";
 import { CanActivate, ExecutionContext, Injectable,CustomDecorator, SetMetadata,Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Reflector } from "@nestjs/core";
+import { plainToInstance } from 'class-transformer';
 import { validate } from "class-validator";
 import hardhat from "hardhat";
 import flatMap from "lodash/flatMap.js";
@@ -54,6 +55,7 @@ export class MaciGuard implements CanActivate {
     const isPublic = this.reflector.get<boolean>(PUBLIC_METADATA_KEY, ctx.getHandler());
 
     if (isPublic) {
+
       return true;
     }
 
@@ -63,12 +65,12 @@ export class MaciGuard implements CanActivate {
       Array.isArray(request.body?.messages) && request.body.messages.length <= MAX_MESSAGES
         ? request.body.messages
         : [];
-
+        
     const messageErrors = await Promise.all(
       map(messages, (message) => validate(Object.assign(new MessageContractParamsDto(), message))),
     ).then((errors) => flatten(errors));
 
-    const dto = Object.assign(new PublishMessagesDto(), request.body);
+    const dto = plainToInstance(PublishMessagesDto, request.body);
     const dtoErrors = await validate(dto);
 
     if (dtoErrors.length > 0 || messageErrors.length > 0) {
