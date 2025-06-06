@@ -85,7 +85,6 @@ describe("MessageTest", () => {
       rapidsnark,
     });
     const poll = testDeploy.contractsData.maciState!.polls.get(0n);
-
     poll!.updatePoll(BigInt(testDeploy.contractsData.maciState!.publicKeys.length));
 
     const [user] = testDeploy.contractsData.users!;

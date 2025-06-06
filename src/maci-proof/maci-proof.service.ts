@@ -7,6 +7,9 @@ import {
   getPoll,
   mergeSignups,
   EMode,
+  timeTravel,
+  ITimeTravelArgs,
+  IGenerateProofsArgs,
 } from "@maci-protocol/sdk";
 import { IProof, ITallyData, generateProofs, proveOnChain } from "@maci-protocol/sdk";
 import { Logger, Injectable } from "@nestjs/common";
@@ -21,20 +24,20 @@ import type { IGenerateArgs, IGenerateData, IMergeArgs, ISubmitProofsArgs } from
 import { ErrorCodes } from "../common/error.js";
 import { CryptoService } from "../crypto/crypto.service.js";
 import { FileService } from "../file/file.service.js";
-import { SessionKeysService } from "../session-keys/session-keys.service.js";
-import hardhat from "hardhat";
+
+import { MACI__factory as MACIFactory, Poll__factory as PollFactory} from "@maci-protocol/contracts";
+
+
 
 @Injectable()
 export class MaciProofService {
-  /**
-   * Deployment helper
-   */
-  private readonly deployment: Deployment;
+
 
   /**
    * Logger
    */
   private readonly logger: Logger;
+
 
   /**
    * Proof generator initialization
@@ -42,9 +45,9 @@ export class MaciProofService {
     constructor(
     private readonly cryptoService: CryptoService,
     private readonly fileService: FileService,
-    private readonly sessionKeysService: SessionKeysService,
+    private readonly deployment: Deployment,
   ) {
-    this.deployment = Deployment.getInstance({ hre });
+    //this.deployment = Deployment.getInstance({ hre });
     this.deployment.setHre(hre);
     this.logger = new Logger(MaciProofService.name);
   }
@@ -75,9 +78,6 @@ export class MaciProofService {
    */
   async generate(
     {
-      approval,
-      sessionKeyAddress,
-      chain,
       poll,
       maciContractAddress,
       mode,
@@ -89,8 +89,7 @@ export class MaciProofService {
     options?: IGenerateProofsOptions,
   ): Promise<IGenerateData> {
     try {
-      //const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval) as Signer;
-      const [signer] = await hardhat.ethers.getSigners();
+      const [signer] = await hre.ethers.getSigners(); 
       const pollData = await getPoll({
         maciAddress: maciContractAddress,
         signer,
@@ -99,7 +98,7 @@ export class MaciProofService {
       });
       const pollContract = await this.deployment.getContract<Poll>({
         name: EContracts.Poll,
-        address: pollData.address,
+        address: pollData.address
       });
       const coordinatorPublicKey = await pollContract.coordinatorPublicKey();
 
@@ -121,7 +120,7 @@ export class MaciProofService {
       // There are only QV and Non-QV modes available for tally circuit
       const tally = this.fileService.getZkeyFilePaths(
         process.env.COORDINATOR_TALLY_ZKEY_NAME!,
-        mode === EMode.QV ? mode : EMode.NON_QV,
+        mode === EMode.FULL ? EMode.NON_QV : mode,
       );
       const messageProcessor = this.fileService.getZkeyFilePaths(
         process.env.COORDINATOR_MESSAGE_PROCESS_ZKEY_NAME!,
@@ -164,9 +163,20 @@ export class MaciProofService {
    * @param args - merge arguments
    * @returns whether the proofs were successfully merged
    */
-  async merge({ maciContractAddress, pollId, approval, sessionKeyAddress, chain }: IMergeArgs): Promise<boolean> {
+  async merge({ maciContractAddress, pollId}: IMergeArgs): Promise<boolean> {
     //const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval)
-    const [signer] = await hardhat.ethers.getSigners();
+    const [signer] = await hre.ethers.getSigners();
+    if(process.env.NODE_ENV === "test"){
+      const maciContract = MACIFactory.connect(maciContractAddress,signer.provider)
+      const pollContracts = await maciContract.getPoll(pollId);
+      const pollContract = PollFactory.connect(pollContracts.poll, signer);
+      const sd = await pollContract.startDate();
+      const params : ITimeTravelArgs = {
+        seconds:  Number(sd) + 10,
+        signer: signer
+      } 
+      await timeTravel(params);
+    }
     await mergeSignups({
       pollId: BigInt(pollId),     
       maciAddress: maciContractAddress,
@@ -183,13 +193,10 @@ export class MaciProofService {
    */
   async submit({
     maciContractAddress,
-    pollId,
-    sessionKeyAddress,
-    approval,
-    chain,
+    pollId
   }: ISubmitProofsArgs): Promise<ITallyData> {
     //const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval);
-    const [signer] = await hardhat.ethers.getSigners();
+    const [signer] = await hre.ethers.getSigners();
     const tallyData = await proveOnChain({
       pollId: BigInt(pollId),
       maciAddress: maciContractAddress,
@@ -212,7 +219,7 @@ export class MaciProofService {
      * @param args publish messages dto
      * @returns transaction and ipfs hashes
      */
-      @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_HOUR, { name: "closePoll" })
+  @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_HOUR, { name: "closePoll" })
       async closePoll(): Promise<boolean> {
         const maciAddress = process.env.MACI_ADDRESS
         const messages = await this.messageRepository.find({ messageBatch: { $exists: false } });

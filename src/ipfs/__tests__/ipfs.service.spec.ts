@@ -1,3 +1,4 @@
+import { expect } from "@jest/globals";
 import { IpfsService } from "../ipfs.service.js";
 
 describe("IpfsService", () => {

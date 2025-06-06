@@ -3,10 +3,9 @@ import { MaciProofService } from './maci-proof.service.js';
 import { MaciProofController } from './maci-proof.controller.js';
 import { CryptoModule } from "../crypto/crypto.module.js";
 import { FileModule } from "../file/file.module.js";
-import { SessionKeysModule } from "../session-keys/session-keys.module.js";
 
 @Module({
-  imports: [FileModule, CryptoModule, SessionKeysModule],
+  imports: [FileModule, CryptoModule],
   providers: [MaciProofService],
   controllers: [MaciProofController]
 })

@@ -41,7 +41,6 @@ import path from "path";
 import { ErrorCodes } from "../common/error.js";
 import { ESupportedNetworks } from "../common/networks.js";
 import { FileService } from "../file/file.service.js";
-import { SessionKeysService } from "../session-keys/session-keys.service.js";
 import hardhat from "hardhat";
 import {
   IDeployMaciArgs,
@@ -76,7 +75,6 @@ export class DeployerService {
    * @param fileService - file service
    */
   constructor(
-    private readonly sessionKeysService: SessionKeysService,
     private readonly fileService: FileService,
   ) {
     this.storage = ContractStorage.getInstance(path.join(process.cwd(), "deployed-contracts.json"));

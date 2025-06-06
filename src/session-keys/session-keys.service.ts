@@ -70,6 +70,8 @@ export class SessionKeysService {
     approval: string,
     chain: ESupportedNetworks,
   ): Promise<KernelClientType> {
+    console.log("🚀 ~ SessionKeysService ~ approval:", approval)
+    console.log("🚀 ~ SessionKeysService ~ sessionKeyAddress:", sessionKeyAddress)
     // retrieve the session key from the file service
     const sessionKey = this.fileService.getSessionKey(sessionKeyAddress);
 
