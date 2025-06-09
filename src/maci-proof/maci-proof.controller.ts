@@ -13,16 +13,15 @@ import { GenerateProofDto, MergeTreesDto, SubmitProofsDto } from "./dto/generate
 import { MaciProofService } from "./maci-proof.service.js";
 
 
-@ApiTags("v1/proof")
+@ApiTags("v1/maci-proof")
 @ApiBearerAuth()
-@Controller("v1/proof")
+@Controller("v1/maci-proof")
 @UseGuards(AccountSignatureGuard)
-@Controller('maci-proof')
 export class MaciProofController {
 
-      /**
-   * Logger
-   */
+  /**
+* Logger
+*/
   private readonly logger = new Logger(MaciProofController.name);
 
   /**
@@ -34,14 +33,14 @@ export class MaciProofController {
   constructor(
     private readonly maciProofGeneratorService: MaciProofService,
     private readonly fileService: FileService,
-  ) {}
+  ) { }
 
-   /**
-   * Generate proofs api method
-   *
-   * @param args - generate proof dto
-   * @returns generated proofs and tally data
-   */
+  /**
+  * Generate proofs api method
+  *
+  * @param args - generate proof dto
+  * @returns generated proofs and tally data
+  */
   @ApiBody({ type: GenerateProofDto })
   @ApiResponse({ status: HttpStatus.CREATED, description: "The proofs have been successfully generated" })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: "Forbidden" })
@@ -54,12 +53,12 @@ export class MaciProofController {
     });
   }
 
-    /**
-   * Merge trees api method
-   *
-   * @param args - merge args
-   * @returns whether the trees were successfully merged
-   */
+  /**
+ * Merge trees api method
+ *
+ * @param args - merge args
+ * @returns whether the trees were successfully merged
+ */
   @ApiBody({ type: MergeTreesDto })
   @ApiResponse({ status: HttpStatus.CREATED, description: "The proofs have been successfully merged" })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: "Forbidden" })
@@ -72,10 +71,10 @@ export class MaciProofController {
     });
   }
 
-    /**
-   * Submit proofs on-chain api method
-   * @param args - submit proofs on-chain args
-   */
+  /**
+ * Submit proofs on-chain api method
+ * @param args - submit proofs on-chain args
+ */
   @ApiBody({ type: SubmitProofsDto })
   @ApiResponse({ status: HttpStatus.CREATED, description: "The proofs have been successfully submitted" })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: "Forbidden" })
@@ -88,11 +87,11 @@ export class MaciProofController {
     });
   }
 
-    /**
-   * Get RSA public key for authorization setup
-   *
-   * @returns RSA public key
-   */
+  /**
+ * Get RSA public key for authorization setup
+ *
+ * @returns RSA public key
+ */
   @ApiResponse({ status: HttpStatus.OK, description: "Public key was successfully returned" })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "BadRequest" })
   @Public()
