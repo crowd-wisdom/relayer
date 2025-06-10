@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { expect, jest } from "@jest/globals";
 import { Test, TestingModule } from '@nestjs/testing';
 import { SemaphoreGateway } from './semaphore.gateway.js';
 import { SemaphoreService } from './semaphore.service.js';

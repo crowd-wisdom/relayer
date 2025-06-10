@@ -39,12 +39,13 @@ export class SemaphoreController {
        const result = await this.semaphoreService.createGroup()
       return result;
     }
+
     @ApiBody({ type: AddMemberDto })
     @ApiResponse({ status: HttpStatus.CREATED, description: "The messages have been successfully accepted" })
     @ApiResponse({ status: HttpStatus.FORBIDDEN, description: "Forbidden" })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "BadRequest" })
     @Post("/addMember")
-    async publish(@Body() args: AddMemberDto): Promise<string> {
+    async addMember(@Body() args: AddMemberDto): Promise<string> {
       return this.semaphoreService.addMember(args).catch((error: Error) => {
         this.logger.error(`Error:`, error);
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
