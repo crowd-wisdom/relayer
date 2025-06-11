@@ -64,7 +64,7 @@ describe('SemaphoreController', () => {
     expect(controller).toBeDefined();
   });
 
-    describe("/addMember", () => {
+describe("/addMember", () => {
       test("should add member", async () => {
         const data = await controller.addMember(mockSemaphoreMember);
   

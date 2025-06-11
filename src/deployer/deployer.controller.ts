@@ -4,7 +4,7 @@ import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 
 import { DeployerService } from "./deployer.service.js";
-import { DeployerServiceDeployMaciDto, DeployerServiceDeployPollDto } from "./dto/dto.js";
+import { DeployerServiceDeployPollDto } from "./dto/dto.js";
 
 @ApiTags("v1/deploy")
 @ApiBearerAuth()

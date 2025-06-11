@@ -58,29 +58,6 @@ export class DeployerServiceDeployMaciDto {
  * Data transfer object for Poll contract deployment
  */
 export class DeployerServiceDeployPollDto {
-  /**
-   * Session Key Approval string
-   */
-  @ApiProperty({
-    description: "Session Key Approval string",
-    type: String,
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  approval?: string;
-
-  /**
-   * Address of the session key
-   */
-  @ApiProperty({
-    description: "Address of the session key",
-    type: String,
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  sessionKeyAddress?: Hex;
 
   /**
    * Chain Name

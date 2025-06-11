@@ -337,7 +337,7 @@ policyType: EPolicies, type: EPolicies, network: ESupportedNetworks, args?: IPol
    * @param args - deploy poll dto
    * @returns poll id
    */
-  async deployPoll({ approval, sessionKeyAddress, chain, config }: IDeployPollArgs): Promise<{ pollId: string }> {
+  async deployPoll({ chain, config }: IDeployPollArgs): Promise<{ pollId: string }> {
     const [signer] = await hardhat.ethers.getSigners();
 
     // check if there is a maci contract deployed on this chain
