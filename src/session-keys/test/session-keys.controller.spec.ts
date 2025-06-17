@@ -1,24 +1,56 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SessionKeysController } from '../session-keys.controller.js';
-import { expect } from '@jest/globals';
-import { FileModule } from 'src/file/file.module.js';
-import { SessionKeysService } from '../session-keys.service.js';
-import { CryptoService } from 'src/crypto/crypto.service.js';
+import { Test } from "@nestjs/testing";
+import { zeroAddress } from "viem";
 
-describe('SessionKeysController', () => {
-  let controller: SessionKeysController;
+import type { IGenerateSessionKeyReturn } from "../types.js";
+
+import { SessionKeysController } from "../session-keys.controller.js";
+import { SessionKeysService } from "../session-keys.service.js";
+import { expect, jest } from "@jest/globals";
+
+describe("SessionKeysController", () => {
+  let sessionKeysController: SessionKeysController;
+
+  const mockSessionKeysService = {
+    generateSessionKey: jest.fn(),
+    deactivateSessionKey: jest.fn(),
+  };
+
+  const defaultGenerateSessionKeyReturn: IGenerateSessionKeyReturn = {
+    sessionKeyAddress: zeroAddress,
+  } as unknown as any;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    const app = await Test.createTestingModule({
       controllers: [SessionKeysController],
-      providers:[SessionKeysService,CryptoService],
-      imports:[FileModule]
-    }).compile();
+    })
+      .useMocker((token) => {
+        if (token === SessionKeysService) {
+          mockSessionKeysService.generateSessionKey.mockImplementation(() => Promise.resolve(defaultGenerateSessionKeyReturn));
+          return mockSessionKeysService;
+        }
 
-    controller = module.get<SessionKeysController>(SessionKeysController);
+        return jest.fn();
+      })
+      .compile();
+
+    sessionKeysController = app.get<SessionKeysController>(SessionKeysController);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe("v1/session-keys/generate", () => {
+    test("should return a session key address", async () => {
+      const data = await sessionKeysController.generateSessionKey();
+      expect(data).toStrictEqual(defaultGenerateSessionKeyReturn);
+    });
+  });
+
+  describe("v1/session-keys/delete", () => {
+    test("should delete a session key", () => {
+      sessionKeysController.deactivateSessionKey({ sessionKeyAddress: zeroAddress });
+      expect(mockSessionKeysService.deactivateSessionKey).toHaveBeenCalledWith(zeroAddress);
+    });
   });
 });

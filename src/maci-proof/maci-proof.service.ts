@@ -25,13 +25,24 @@ import { ErrorCodes } from "../common/error.js";
 import { CryptoService } from "../crypto/crypto.service.js";
 import { FileService } from "../file/file.service.js";
 
-import { MACI__factory as MACIFactory, Poll__factory as PollFactory} from "@maci-protocol/contracts";
+import { ContractStorage, MACI__factory as MACIFactory, Poll__factory as PollFactory} from "@maci-protocol/contracts";
+import { ESupportedNetworks } from "../common/networks.js";
+import { getCoordinatorKeypair } from "src/common/coordinatorKeypair.js";
 
 
 
 @Injectable()
 export class MaciProofService {
 
+  /**
+     * Contract storage instance
+     */
+  private readonly storage: ContractStorage;
+  
+  /**
+   * Deployment helper
+   */
+  private readonly deployment: Deployment;
 
   /**
    * Logger
@@ -45,10 +56,10 @@ export class MaciProofService {
     constructor(
     private readonly cryptoService: CryptoService,
     private readonly fileService: FileService,
-    private readonly deployment: Deployment,
   ) {
-    //this.deployment = Deployment.getInstance({ hre });
+    this.deployment = Deployment.getInstance({ hre });
     this.deployment.setHre(hre);
+    this.storage = ContractStorage.getInstance(path.join(process.cwd(), "deployed-contracts.json"));
     this.logger = new Logger(MaciProofService.name);
   }
 
@@ -81,7 +92,6 @@ export class MaciProofService {
       poll,
       maciContractAddress,
       mode,
-      encryptedCoordinatorPrivateKey,
       startBlock,
       endBlock,
       blocksPerBatch,
@@ -100,19 +110,16 @@ export class MaciProofService {
         name: EContracts.Poll,
         address: pollData.address
       });
-      const coordinatorPublicKey = await pollContract.coordinatorPublicKey();
-
-      const { privateKey } = await this.fileService.getPrivateKey();
-      const maciPrivateKey = PrivateKey.deserialize(
-        this.cryptoService.decrypt(privateKey, encryptedCoordinatorPrivateKey),
-      );
-      const coordinatorKeypair = new Keypair(maciPrivateKey);
-      const publicKey = new PublicKey([
-        BigInt(coordinatorPublicKey.x.toString()),
-        BigInt(coordinatorPublicKey.y.toString()),
+      
+      const publicKeyOnChain = await pollContract.coordinatorPublicKey();
+      const coordinatorPublicKeyOnChain = new PublicKey([
+        BigInt(publicKeyOnChain.x.toString()),
+        BigInt(publicKeyOnChain.y.toString()),
       ]);
 
-      if (!coordinatorKeypair.publicKey.equals(publicKey)) {
+      const coordinatorKeypair = getCoordinatorKeypair();
+
+      if (!coordinatorKeypair.publicKey.equals(coordinatorPublicKeyOnChain)) {
         this.logger.error(`Error: ${ErrorCodes.PRIVATE_KEY_MISMATCH}, wrong private key`);
         throw new Error(ErrorCodes.PRIVATE_KEY_MISMATCH.toString());
       }
@@ -129,7 +136,7 @@ export class MaciProofService {
 
       const { processProofs, tallyProofs, tallyData } = await generateProofs({
         outputDir: path.resolve("./proofs"),
-        coordinatorPrivateKey: maciPrivateKey.serialize(),
+        coordinatorPrivateKey: coordinatorKeypair.privateKey.serialize(),
         signer,
         maciAddress: maciContractAddress,
         pollId: BigInt(poll),
@@ -221,18 +228,47 @@ export class MaciProofService {
      */
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_HOUR, { name: "closePoll" })
       async closePoll(): Promise<boolean> {
-        const maciAddress = process.env.MACI_ADDRESS
-        const messages = await this.messageRepository.find({ messageBatch: { $exists: false } });
-    
-        if (messages.length === 0) {
-          return false;
+        const pollsAddress = this.storage.getAddresses(['Poll'],hre.network.name)
+        const maciContractAddress = process.env.MACI_ADDRESS
+        const chain = hre.network.name
+        const [signer] = await hre.ethers.getSigners()
+        const actualDate = Date.now();
+        if(pollsAddress?.length){
+          pollsAddress.forEach(async pollAddress=> {
+            const poll = PollFactory.connect(pollAddress as string,signer)
+            const endDatePoll = await poll.endDate()
+            if (endDatePoll <= BigInt(actualDate)) {
+
+              const pollId = await poll.pollId()
+              // Merge messages
+              const mergeParams : IMergeArgs = {
+                maciContractAddress : maciContractAddress as string,
+                pollId : Number(pollId),
+                chain : chain as ESupportedNetworks
+              }
+              await this.merge(mergeParams)
+
+              // Generate proof
+                const proofArgs : IGenerateArgs = {
+                  poll: Number(pollId),
+                  maciContractAddress: maciContractAddress as string,
+                  mode: EMode.QV,
+                  chain: chain as ESupportedNetworks
+                };
+               await this.generate(proofArgs) 
+              
+              // Submit proof
+              const submitProofParams : ISubmitProofsArgs = {
+                maciContractAddress : maciContractAddress as string,
+                pollId : Number(pollId),
+                chain : chain as ESupportedNetworks
+              }
+              await this.submit(submitProofParams)
+            } 
+          })
+              return true  
+        }else{
+          return false
         }
-    
-        await this.saveMessageBatches([{ messages }]).catch((error) => {
-          this.logger.error(`Save message batch error:`, error);
-          throw error;
-        });
-    
-        return true;
       }
 }

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SemaphoreController } from './semaphore.controller.js';
+import { SemaphoreController } from '../semaphore.controller.js';
 import { expect, jest } from '@jest/globals';
-import { SemaphoreService } from './semaphore.service.js';
+import { SemaphoreService } from '../semaphore.service.js';
 import { ethers } from 'ethers';
 import { HttpException, HttpStatus } from '@nestjs/common';
 

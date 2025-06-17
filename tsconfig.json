@@ -25,11 +25,6 @@
     "allowJs": true,
     "esModuleInterop": true,
     "resolveJsonModule": true
-    // "paths": {
-    //   "ethers": [
-    //     "node_modules/ethers/lib.commonjs/index.js"
-    //   ]
-    // }
   },
   "include": [
     "./src",

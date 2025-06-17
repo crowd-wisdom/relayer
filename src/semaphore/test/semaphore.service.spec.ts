@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SemaphoreService } from './semaphore.service.js';
+import { SemaphoreService } from '../semaphore.service.js';
 import { expect, jest } from '@jest/globals';
 import { ethers } from 'ethers';
 import { ConfigService } from '@nestjs/config';

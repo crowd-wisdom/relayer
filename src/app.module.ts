@@ -12,7 +12,7 @@ import { MaciProofModule } from './maci-proof/maci-proof.module.js';
 import { CryptoModule } from './crypto/crypto.module.js';
 import { FileModule } from './file/file.module.js';
 import { SessionKeysModule } from './session-keys/session-keys.module.js';
-import { DeployerModule } from './deployer/deployer.module';
+import { DeployerModule } from './deployer/deployer.module.js';
 
 
 

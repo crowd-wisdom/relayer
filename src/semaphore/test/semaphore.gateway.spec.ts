@@ -1,10 +1,10 @@
 import { expect, jest } from "@jest/globals";
 import { Test, TestingModule } from '@nestjs/testing';
-import { SemaphoreGateway } from './semaphore.gateway.js';
-import { SemaphoreService } from './semaphore.service.js';
-import { EAddMemberEvents, IAddMembersOptions } from './types.js';
+import { SemaphoreGateway } from '../semaphore.gateway.js';
+import { SemaphoreService } from '../semaphore.service.js';
+import { EAddMemberEvents, IAddMembersOptions } from '../types.js';
 import { Server } from 'socket.io';
-import { AddMemberDto } from './addMember.dto.js';
+import { AddMemberDto } from '../dto/addMember.dto.js';
 
 describe('SemaphoreGateway', () => {
   let gateway: SemaphoreGateway;
@@ -16,27 +16,27 @@ describe('SemaphoreGateway', () => {
   const mockEmit = jest.fn();
 
   const defaultAddMemberData: AddMemberDto = {
-    groupId:1,
+    groupId: 1,
     identityCommitment: "11237622825477336339577122413451117718539783476837539122310492284566644730311n"
   };
 
-  const txHash =  "0xe1ece1280afa659cd89ce3d33a1fcd07bdae004b458e29b96bd5002ba86020fb"
+  const txHash = "0xe1ece1280afa659cd89ce3d33a1fcd07bdae004b458e29b96bd5002ba86020fb"
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [SemaphoreGateway],
     }).useMocker((token) => {
-        if (token === SemaphoreService) {
-          mockSemaphoreService.addMember.mockImplementation((_, options?: IAddMembersOptions) => {
-            options?.onComplete?.(txHash);
-            options?.onFail?.(new Error("error"));
-          });
+      if (token === SemaphoreService) {
+        mockSemaphoreService.addMember.mockImplementation((_, options?: IAddMembersOptions) => {
+          options?.onComplete?.(txHash);
+          options?.onFail?.(new Error("error"));
+        });
 
-          return mockSemaphoreService;
-        }
+        return mockSemaphoreService;
+      }
 
-        return jest.fn();
-      })
+      return jest.fn();
+    })
       .compile();
 
     gateway = module.get<SemaphoreGateway>(SemaphoreGateway);
@@ -58,7 +58,7 @@ describe('SemaphoreGateway', () => {
     expect(mockEmit).toHaveBeenCalledTimes(2);
 
     expect(mockEmit).toHaveBeenNthCalledWith(1, EAddMemberEvents.FINISH, {
-      dataTransaction:txHash
+      dataTransaction: txHash
     });
     expect(mockEmit).toHaveBeenNthCalledWith(2, EAddMemberEvents.ERROR, { message: "error" });
   });

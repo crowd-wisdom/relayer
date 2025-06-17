@@ -13,6 +13,9 @@ import { SessionKeysService } from "./session-keys.service.js";
 @Controller("v1/session-keys")
 //@UseGuards(AccountSignatureGuard)
 export class SessionKeysController {
+  sessionKeysController(arg0: { sessionKeyAddress: "0x0000000000000000000000000000000000000000"; }) {
+    throw new Error("Method not implemented.");
+  }
   /**
    * Initialize SessionKeysController
    *

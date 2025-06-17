@@ -1,18 +1,18 @@
-import { AddMemberDto } from "./addMember.dto.js";
+import { AddMemberDto } from "./dto/addMember.dto.js";
 
 /**
  * WS events for add member
  */
 export enum EAddMemberEvents {
-    START = "start-add-member",
-    PROGRESS = "progress-add-member",
-    FINISH = "finish-add-member",
-    ERROR = "exception-add-member",
-  }
+  START = "start-add-member",
+  PROGRESS = "progress-add-member",
+  FINISH = "finish-add-member",
+  ERROR = "exception-add-member",
+}
 
-  /**
- * Interface that represents add member options
- */
+/**
+* Interface that represents add member options
+*/
 export interface IAddMembersOptions {
 
   /**
@@ -20,7 +20,7 @@ export interface IAddMembersOptions {
    *
    * @param dataTransaction - proof generated data
    */
-  onComplete?: (dataTransaction : string) => void;
+  onComplete?: (dataTransaction: string) => void;
 
   /**
    * Hook to call when generation is failed

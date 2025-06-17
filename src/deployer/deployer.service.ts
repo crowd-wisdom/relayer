@@ -64,11 +64,12 @@ import {
  */
 @Injectable()
 export class DeployerService {
+
   /**
    * Contract storage instance
    */
   private readonly storage: ContractStorage;
-
+  
   /**
    * Create a new instance of DeployerService
    *
@@ -79,6 +80,7 @@ export class DeployerService {
   ) {
     this.storage = ContractStorage.getInstance(path.join(process.cwd(), "deployed-contracts.json"));
   }
+
 
   /**
    * Get the policy contract object

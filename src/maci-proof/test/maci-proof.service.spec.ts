@@ -98,7 +98,7 @@ describe("ProofGeneratorService", () => {
       merge: jest.fn(() => Promise.resolve(true)),
     };
 
-    (Deployment.getInstance as jest.Mock).mockReturnValue(defaultDeploymentService);
+    //(Deployment.getInstance as jest.Mock).mockReturnValue(defaultDeploymentService);
     (ProofGenerator as unknown as jest.Mock).mockReturnValue(defaultProofGenerator);
 
     // @ts-expect-error: método estático simulado

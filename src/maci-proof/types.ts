@@ -65,7 +65,7 @@ export interface IGenerateArgs {
   /**
    * Encrypted coordinator private key with RSA public key (see .env.example)
    */
-  encryptedCoordinatorPrivateKey: string;
+  encryptedCoordinatorPrivateKey?: string;
 
   /**
    * Start block for event processing
