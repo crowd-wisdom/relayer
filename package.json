@@ -37,8 +37,8 @@
   "dependencies": {
     "@helia/json": "npm:@helia/json@^4.0.2",
     "@maci-protocol/contracts": "^3.0.0",
-    "@maci-protocol/domainobjs": "^3.0.0",
     "@maci-protocol/crypto": "^3.0.0",
+    "@maci-protocol/domainobjs": "^3.0.0",
     "@maci-protocol/sdk": "^1.0.0",
     "@maci-protocol/testing": "^1.0.0",
     "@nestjs/common": "npm:@nestjs/common@^11.0.10",
@@ -61,6 +61,7 @@
     "@zerodev/ecdsa-validator": "npm:@zerodev/ecdsa-validator@^5.4.9",
     "@zerodev/permissions": "npm:@zerodev/permissions@^5.5.5",
     "@zerodev/sdk": "npm:@zerodev/sdk@^5.4.35",
+    "@zk-kit/baby-jubjub": "npm:@zk-kit/baby-jubjub@^1.0.3",
     "class-transformer": "npm:class-transformer@^0.5.1",
     "class-validator": "npm:class-validator@^0.14.1",
     "dotenv": "npm:dotenv@^16.4.7",

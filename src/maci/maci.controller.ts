@@ -4,9 +4,11 @@ import { ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { MaciService } from './maci.service.js';
 import { PublishMessagesDto } from "./dto/message.dto.js";
 import { Message } from "./schemas/message.schema.js";
+import { MaciGuard } from "./maci.guard.js";
 
 @ApiTags('v1/maci') 
 @Controller('v1/maci')
+@UseGuards(MaciGuard)
 export class MaciController {
     /**
    * Logger

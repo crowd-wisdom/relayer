@@ -25,9 +25,9 @@ import { ErrorCodes } from "../common/error.js";
 import { CryptoService } from "../crypto/crypto.service.js";
 import { FileService } from "../file/file.service.js";
 
-import { ContractStorage, MACI__factory as MACIFactory, Poll__factory as PollFactory} from "@maci-protocol/contracts";
+import { ContractStorage, MACI__factory as MACIFactory, Poll__factory as PollFactory } from "@maci-protocol/contracts";
 import { ESupportedNetworks } from "../common/networks.js";
-import { getCoordinatorKeypair } from "src/common/coordinatorKeypair.js";
+import { getCoordinatorKeypair } from "../common/coordinatorKeypair.js";
 
 
 
@@ -38,7 +38,7 @@ export class MaciProofService {
      * Contract storage instance
      */
   private readonly storage: ContractStorage;
-  
+
   /**
    * Deployment helper
    */
@@ -53,7 +53,7 @@ export class MaciProofService {
   /**
    * Proof generator initialization
    */
-    constructor(
+  constructor(
     private readonly cryptoService: CryptoService,
     private readonly fileService: FileService,
   ) {
@@ -63,12 +63,12 @@ export class MaciProofService {
     this.logger = new Logger(MaciProofService.name);
   }
 
-    /**
-   * Read and parse proofs
-   * @param folder - folder path to read proofs from
-   * @param type - type of proofs to read (tally or process)
-   * @returns proofs
-   */
+  /**
+ * Read and parse proofs
+ * @param folder - folder path to read proofs from
+ * @param type - type of proofs to read (tally or process)
+ * @returns proofs
+ */
   async readProofs(folder: string, type: "tally" | "process"): Promise<IProof[]> {
     const files = await fs.promises.readdir(folder);
     return Promise.all(
@@ -81,12 +81,12 @@ export class MaciProofService {
     );
   }
 
-    /**
-   * Generate proofs for message processing and tally
-   *
-   * @param args - generate proofs arguments
-   * @returns - generated proofs for message processing and tally
-   */
+  /**
+ * Generate proofs for message processing and tally
+ *
+ * @param args - generate proofs arguments
+ * @returns - generated proofs for message processing and tally
+ */
   async generate(
     {
       poll,
@@ -99,7 +99,7 @@ export class MaciProofService {
     options?: IGenerateProofsOptions,
   ): Promise<IGenerateData> {
     try {
-      const [signer] = await hre.ethers.getSigners(); 
+      const [signer] = await hre.ethers.getSigners();
       const pollData = await getPoll({
         maciAddress: maciContractAddress,
         signer,
@@ -110,7 +110,7 @@ export class MaciProofService {
         name: EContracts.Poll,
         address: pollData.address
       });
-      
+
       const publicKeyOnChain = await pollContract.coordinatorPublicKey();
       const coordinatorPublicKeyOnChain = new PublicKey([
         BigInt(publicKeyOnChain.x.toString()),
@@ -164,28 +164,28 @@ export class MaciProofService {
       throw error;
     }
   }
-    /**
-   * Merge state and message trees
-   *
-   * @param args - merge arguments
-   * @returns whether the proofs were successfully merged
-   */
-  async merge({ maciContractAddress, pollId}: IMergeArgs): Promise<boolean> {
+  /**
+ * Merge state and message trees
+ *
+ * @param args - merge arguments
+ * @returns whether the proofs were successfully merged
+ */
+  async merge({ maciContractAddress, pollId }: IMergeArgs): Promise<boolean> {
     //const signer = await this.sessionKeysService.getCoordinatorSigner(chain, sessionKeyAddress, approval)
     const [signer] = await hre.ethers.getSigners();
-    if(process.env.NODE_ENV === "test"){
-      const maciContract = MACIFactory.connect(maciContractAddress,signer.provider)
+    if (process.env.NODE_ENV === "test") {
+      const maciContract = MACIFactory.connect(maciContractAddress, signer.provider)
       const pollContracts = await maciContract.getPoll(pollId);
       const pollContract = PollFactory.connect(pollContracts.poll, signer);
       const sd = await pollContract.startDate();
-      const params : ITimeTravelArgs = {
-        seconds:  Number(sd) + 10,
+      const params: ITimeTravelArgs = {
+        seconds: Number(sd) + 10,
         signer: signer
-      } 
+      }
       await timeTravel(params);
     }
     await mergeSignups({
-      pollId: BigInt(pollId),     
+      pollId: BigInt(pollId),
       maciAddress: maciContractAddress,
       signer,
     });
@@ -220,55 +220,62 @@ export class MaciProofService {
   }
 
 
-      /**
-     * Generate proof,merge message and submit proof on onchain
-     *
-     * @param args publish messages dto
-     * @returns transaction and ipfs hashes
-     */
-  @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_HOUR, { name: "closePoll" })
-      async closePoll(): Promise<boolean> {
-        const pollsAddress = this.storage.getAddresses(['Poll'],hre.network.name)
-        const maciContractAddress = process.env.MACI_ADDRESS
-        const chain = hre.network.name
-        const [signer] = await hre.ethers.getSigners()
-        const actualDate = Date.now();
-        if(pollsAddress?.length){
-          pollsAddress.forEach(async pollAddress=> {
-            const poll = PollFactory.connect(pollAddress as string,signer)
-            const endDatePoll = await poll.endDate()
-            if (endDatePoll <= BigInt(actualDate)) {
+  /**
+ * Generate proof,merge message and submit proof on onchain
+ *
+ * @param args publish messages dto
+ * @returns transaction and ipfs hashes
+ */
+  @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_5_MINUTES, { name: "closePoll" })
 
-              const pollId = await poll.pollId()
-              // Merge messages
-              const mergeParams : IMergeArgs = {
-                maciContractAddress : maciContractAddress as string,
-                pollId : Number(pollId),
-                chain : chain as ESupportedNetworks
-              }
-              await this.merge(mergeParams)
+  async closePoll(): Promise<boolean> {
+    this.logger.log("Comienaza el cron de closePoll", hre.network.name);
+    const pollsAddressInstances = this.storage.getAllAddressesById('Poll', hre.network.name);
+    //const pollsAddressInstances2 = this.storage.getAddresses(['Poll'], hre.network.name, ['poll-']);
+    const pollsAddress = pollsAddressInstances 
+    const maciContractAddress = process.env.MACI_ADDRESS
+    const chain = hre.network.name
+    const [signer] = await hre.ethers.getSigners()
 
-              // Generate proof
-                const proofArgs : IGenerateArgs = {
-                  poll: Number(pollId),
-                  maciContractAddress: maciContractAddress as string,
-                  mode: EMode.QV,
-                  chain: chain as ESupportedNetworks
-                };
-               await this.generate(proofArgs) 
-              
-              // Submit proof
-              const submitProofParams : ISubmitProofsArgs = {
-                maciContractAddress : maciContractAddress as string,
-                pollId : Number(pollId),
-                chain : chain as ESupportedNetworks
-              }
-              await this.submit(submitProofParams)
-            } 
-          })
-              return true  
-        }else{
-          return false
+    if (pollsAddress?.length) {
+      pollsAddress.forEach(async pollAddress => {
+        const poll = PollFactory.connect(pollAddress as string, signer)
+        const endDatePoll = await poll.endDate()
+        const actualDate = BigInt(Date.now());
+        if (endDatePoll <= actualDate) {
+          const isMerged = await poll.stateMerged()
+          const pollId = await poll.pollId()
+          if (!isMerged) {
+            // Merge messages
+            const mergeParams: IMergeArgs = {
+              maciContractAddress: maciContractAddress as string,
+              pollId: Number(pollId),
+              chain: chain as ESupportedNetworks
+            }
+            await this.merge(mergeParams)
+
+           // Generate proof
+          const proofArgs: IGenerateArgs = {
+            poll: Number(pollId),
+            maciContractAddress: maciContractAddress as string,
+            mode: EMode.QV,
+            chain: chain as ESupportedNetworks
+          };
+          await this.generate(proofArgs)
+
+          // Submit proof
+          const submitProofParams: ISubmitProofsArgs = {
+            maciContractAddress: maciContractAddress as string,
+            pollId: Number(pollId),
+            chain: chain as ESupportedNetworks
+          }
+          await this.submit(submitProofParams)
+          }
         }
-      }
+      })
+      return true
+    } else {
+      return false
+    }
+  }
 }
